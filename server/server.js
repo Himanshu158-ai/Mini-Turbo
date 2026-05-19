@@ -4,7 +4,8 @@ import fs from "fs";
 import { exec, spawn } from "child_process";
 import path from "path";
 import dotenv from "dotenv";
-dotenv.config()
+
+dotenv.config();
 
 const app = express();
 
@@ -18,18 +19,19 @@ app.post("/run", (req, res) => {
     // Save user code
     fs.writeFileSync("temp.c", code);
 
+    // console.log(process.env.COMPILE_PATH);
     // Compile command
-    console.log(process.env.COMPILE_COMMAND);
-    const command = process.env.COMPILE_COMMAND;
+    const command =
+    `set PATH=${process.env.COMPILE_PATH};%PATH% && gcc temp.c graphics.c -IC:/msys64/ucrt64/include/SDL2 -LC:/msys64/ucrt64/lib -lSDL2 -lm -o temp.exe`;
 
-    // console.log("RUNNING GCC...");
+    console.log("RUNNING GCC...");
 
     exec(command, (compileError, stdout, stderr) => {
 
         // Compile Error
         if (compileError) {
 
-            // console.log(stderr);
+            console.log(stderr);
 
             return res.json({
                 success: false,
@@ -37,18 +39,23 @@ app.post("/run", (req, res) => {
             });
         }
 
-        // console.log("COMPILE SUCCESS");
+        console.log("COMPILE SUCCESS");
 
-        // exe full path
-        const exePath = path.join(process.cwd(), "temp.exe");
+        // Full exe path
+        const exePath = path.resolve("temp.exe");
+
+        console.log(exePath);
 
         // Open graphics window
-        spawn(exePath, [], {
-            detached: true,
-            stdio: "ignore"
-        }).unref();
+        const child = spawn(exePath, [], {
+            detached: true
+        });
 
-        // Response to frontend
+        child.on("error", (err) => {
+            console.log("SPAWN ERROR:", err);
+        });
+
+        // Send response
         res.json({
             success: true,
             output: "Graphics Window Opened Successfully 😭🔥"

@@ -10,7 +10,7 @@ int main() {
     return 0;
 }`);
 
-  const [output, setOutput] = useState("Mini Turbo C Ready...");
+  const [output, setOutput] = useState("Cheater's Turbo Ready...");
 
   const runCode = async () => {
     setOutput("Running...");
@@ -36,7 +36,7 @@ int main() {
       <div className="h-14 border-b border-gray-700 flex items-center justify-between px-4">
 
         <h1 className="text-xl font-bold text-cyan-400">
-          Mini Turbo C
+          CHEATER's Turbo C
         </h1>
 
         <button
@@ -53,7 +53,7 @@ int main() {
         {/* Editor */}
         <Editor
           height="100%"
-          width="45%"
+          width="70%"
           defaultLanguage="c"
           theme="vs-dark"
           value={code}
@@ -65,7 +65,7 @@ int main() {
         />
 
         {/* Output Panel */}
-        <div className="w-[55%] bg-black p-4 overflow-auto">
+        <div className="w-[30%] bg-black p-4 overflow-auto">
 
           <h2 className="text-cyan-400 font-bold mb-3">
             OUTPUT
