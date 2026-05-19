@@ -1,7 +1,10 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config()
 
 const app = express();
 
@@ -12,37 +15,43 @@ app.post("/run", (req, res) => {
 
     const code = req.body.code;
 
-    // save code
+    // Save user code
     fs.writeFileSync("temp.c", code);
 
-    // compile command
-    const command = `gcc temp.c -o temp.exe`;
+    // Compile command
+    console.log(process.env.COMPILE_COMMAND);
+    const command = process.env.COMPILE_COMMAND;
+
+    // console.log("RUNNING GCC...");
 
     exec(command, (compileError, stdout, stderr) => {
 
-        // compile error
+        // Compile Error
         if (compileError) {
+
+            // console.log(stderr);
+
             return res.json({
                 success: false,
-                output: stderr
+                output: stderr || compileError.message
             });
         }
 
-        // run exe
-        exec("temp.exe", (runError, runStdout, runStderr) => {
+        // console.log("COMPILE SUCCESS");
 
-            if (runError) {
-                return res.json({
-                    success: false,
-                    output: runStderr
-                });
-            }
+        // exe full path
+        const exePath = path.join(process.cwd(), "temp.exe");
 
-            res.json({
-                success: true,
-                output: runStdout || "Program Executed Successfully"
-            });
+        // Open graphics window
+        spawn(exePath, [], {
+            detached: true,
+            stdio: "ignore"
+        }).unref();
 
+        // Response to frontend
+        res.json({
+            success: true,
+            output: "Graphics Window Opened Successfully 😭🔥"
         });
 
     });

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
+import axios from "axios";
 
 function App() {
   const [code, setCode] = useState(`#include <graphics.h>
@@ -11,13 +12,21 @@ int main() {
 
   const [output, setOutput] = useState("Mini Turbo C Ready...");
 
-  const runCode = () => {
-    setOutput(`
-Compiling...
+  const runCode = async () => {
+    setOutput("Running...");
 
-Program Executed Successfully.
-Graphics Window Opened.
-`);
+    const payload = {
+      code: code
+    };
+
+    try {
+      const resp = await axios.post("http://localhost:5000/run", payload);
+      setOutput(resp.data.output);
+      // console.log(resp.data);
+    } catch (error) {
+      console.log(error);
+      setOutput("ERROR AA GYA 😭");
+    }
   };
 
   return (
@@ -58,7 +67,7 @@ Graphics Window Opened.
         {/* Output Panel */}
         <div className="w-[55%] bg-black p-4 overflow-auto">
 
-          <h2 className="text-green-400 font-bold mb-3">
+          <h2 className="text-cyan-400 font-bold mb-3">
             OUTPUT
           </h2>
 
